@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Volunteer Programme Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0f766e;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .notice {
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+            min-width: 0;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #115e59;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        textarea,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font: inherit;
+            margin-bottom: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        fieldset {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin: 0 0 16px;
+            padding: 12px;
+        }
+
+        legend {
+            font-weight: bold;
+            padding: 0 6px;
+        }
+
+        .skill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: normal;
+        }
+
+        .skill input {
+            width: 17px;
+            height: 17px;
+        }
+
+        button {
+            background: #0f766e;
+            color: white;
+            border: 0;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #115e59;
+        }
+
+        .result {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 22px;
+        }
+
+        .answer {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .matched {
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .role-gap {
+            border-top: 1px solid #cbd5e1;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .role-gap h4 {
+            margin: 0 0 6px;
+        }
+
+        .role-gap p {
+            margin: 4px 0;
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 760px) {
+            .columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Volunteer Programme Assistant</h1>
+        <p>Explore programme information and find suitable volunteer roles.</p>
+    </header>
+
+    <main>
+        <div class="notice">
+            Classroom demonstration using fictional programme rules.
+            Suggestions do not register you or allocate a role.
+        </div>
+
+        {% if error %}
+            <div class="error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <div class="columns">
+
+            <section class="card">
+                <h2>Ask about the programme</h2>
+
+                <p>
+                    Ask about registration, role requirements,
+                    orientation, or participation rules.
+                </p>
+
+                <form method="post" action="{{ url_for('index') }}">
+                    <input type="hidden" name="action" value="ask">
+
+                    <label for="question">Your question</label>
+
+                    <textarea
+                        id="question"
+                        name="question"
+                        placeholder="Who confirms final role allocation?"
+                        required
+                    >{{ question }}</textarea>
+
+                    <button type="submit">Ask question</button>
+                </form>
+
+                {% if answer is not none %}
+                    <div class="result">
+                        <h3>Answer</h3>
+
+                        <div class="answer">{{ answer }}</div>
+
+                        {% if sources %}
+                            <p><strong>Retrieved documents:</strong></p>
+
+                            <ul>
+                                {% for source in sources %}
+                                    <li>{{ source }}</li>
+                                {% endfor %}
+                            </ul>
+
+                            <p class="muted">
+                                These documents were retrieved for the question.
+                                Retrieval alone does not mean they contain
+                                an answer.
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <h2>Find volunteer roles</h2>
+
+                <p>
+                    Select your skills and enter your weekly availability.
+                </p>
+
+                <form method="post" action="{{ url_for('index') }}">
+                    <input
+                        type="hidden"
+                        name="action"
+                        value="match_volunteer_roles"
+                    >
+
+                    <fieldset>
+                        <legend>Your skills</legend>
+
+                        {% for code, label in skill_labels.items() %}
+                            <label class="skill">
+                                <input
+                                    type="checkbox"
+                                    name="skills"
+                                    value="{{ code }}"
+                                    {% if code in selected_skills %}
+                                        checked
+                                    {% endif %}
+                                >
+                                {{ label }}
+                            </label>
+                        {% endfor %}
+                    </fieldset>
+
+                    <label for="available_hours">
+                        Available hours per week
+                    </label>
+
+                    <input
+                        type="number"
+                        id="available_hours"
+                        name="available_hours"
+                        min="0"
+                        step="any"
+                        value="{{ hours_value }}"
+                        placeholder="Example: 3"
+                        required
+                    >
+
+                    <button type="submit">Find volunteer roles</button>
+                </form>
+
+                {% if tool_result is not none %}
+                    <div class="result">
+                        <h3>Matching roles</h3>
+
+                        {% if tool_result.matching_roles %}
+                            {% for role in tool_result.matching_roles %}
+                                <div class="matched">{{ role }}</div>
+                            {% endfor %}
+                        {% else %}
+                            <p>
+                                No roles currently match both your skills
+                                and available hours.
+                            </p>
+                        {% endif %}
+
+                        {% if tool_result.other_roles %}
+                            <h3>Gaps for other roles</h3>
+
+                            {% for item in tool_result.other_roles %}
+                                <div class="role-gap">
+                                    <h4>{{ item.role }}</h4>
+
+                                    <p>
+                                        <strong>Missing skills:</strong>
+
+                                        {% if item.missing_skills %}
+                                            {% for skill in item.missing_skills %}
+                                                {{ skill_labels[skill] }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                    </p>
+
+                                    <p>
+                                        <strong>Additional hours needed:</strong>
+                                        {{ item.additional_hours_needed }}
+                                        per week
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <p class="muted">
+                            Each role is assessed independently.
+                            Matching multiple roles does not mean you
+                            are expected to take all of them.
+                            The programme coordinator confirms final allocation.
+                        </p>
+                    </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+</body>
+</html>

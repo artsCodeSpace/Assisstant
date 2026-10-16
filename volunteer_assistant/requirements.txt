@@ -1,0 +1,10 @@
+Flask
+python-dotenv
+
+langchain-core
+langchain-groq
+langchain-huggingface
+langchain-chroma
+langchain-text-splitters
+langgraph
+sentence-transformers
